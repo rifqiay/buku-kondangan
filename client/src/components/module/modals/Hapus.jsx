@@ -1,15 +1,50 @@
 import React, { useState } from "react";
+import jwt_decode from "jwt-decode";
+import { useLocation } from "react-router-dom";
+import { api } from "../../../config/api";
+import { deleteDataUang } from "../../../config/featrues/DataUangSlice";
 import { useDispatch } from "react-redux";
-import { hapusUangAction } from "../../../config/redux/action/Get";
+import { deleteDataBarang } from "../../../config/featrues/DataBarangSlice";
 
-const Hapus = ({ children, nama, idTamu }) => {
-  const dispatch = useDispatch();
+const Hapus = ({
+  children,
+  nama,
+  idTamu,
+  setIsDeleted,
+  toast,
+  setIsChecked,
+}) => {
+  const location = useLocation();
   const [show, setShow] = useState(false);
+  const token = localStorage.getItem("token");
+  const { id } = jwt_decode(token);
+  const dispatch = useDispatch();
 
-  const handleDelete = () => {
-    // dispatch(hapusUangAction(idTamu, setShow));
-    console.log(idTamu);
+  const handleDelete = async () => {
+    if (location.pathname === "/home") {
+      dispatch(
+        deleteDataUang({ idTamu, toast, setIsDeleted, setShow, setIsChecked })
+      );
+    } else {
+      dispatch(
+        deleteDataBarang({ idTamu, toast, setIsDeleted, setShow, setIsChecked })
+      );
+      // try {
+      //   const response = await api.delete(`barang/delete/${idTamu}`);
+      //   console.log(response);
+      //   toast.success(response.data.message);
+      //   setIsDeleted(true);
+      //   setShow(false);
+      //   setIsChecked();
+      //   setTimeout(() => {
+      //     setIsDeleted(false);
+      //   }, 1000);
+      // } catch (error) {
+      //   console.log(error);
+      // }
+    }
   };
+
   return (
     <>
       <div onClick={() => setShow(true)}>{children}</div>

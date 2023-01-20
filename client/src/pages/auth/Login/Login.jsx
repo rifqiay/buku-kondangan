@@ -3,59 +3,36 @@ import { BsEye } from "react-icons/bs";
 import { BsEyeSlash } from "react-icons/bs";
 import { Spinner } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useFormik } from "formik";
-import * as Yup from "yup";
-import axios from "axios";
+import { api } from "../../../config/api";
+import { login } from "../../../config/featrues/AuthSlice";
 import { useDispatch } from "react-redux";
-import { LoginAction } from "../../../config/redux/action/Auth";
 
 const Login = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(true);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
 
   const handleShowPassword = () => {
     showPassword ? setShowPassword(false) : setShowPassword(true);
   };
 
-  const {
-    values,
-    handleChange,
-    errors,
-    handleSubmit,
-    resetForm,
-    handleBlur,
-    touched,
-  } = useFormik({
-    // initial values
+  const { values, handleSubmit, handleChange, handleReset } = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
-    // validation
-    validationSchema: Yup.object({
-      email: Yup.string().required("harus diisi").email("email tidak valid"),
-      password: Yup.string()
-        .required("harus diisi")
-        .min(5, "Minimal 5 karakter Maksimal 10 karakter")
-        .max(10, "Maksimal 10 karakter")
-        .matches(/[A-Z]/g, "Setidaknya mengandung 1 huruf Kapital"),
-    }),
-    // onSubmit
-    onSubmit: () => {
+    onSubmit: async () => {
       setLoading(true);
-      dispatch(LoginAction(values, setLoading, navigate, resetForm));
-      // axios
-      //   .post(`http://localhost:5000/api/auth/login`, values)
-      //   .then((res) => console.log(res))
-      //   .catch((error) => console.error(error));
-      // resetForm();
+      dispatch(login({ values, toast, setLoading, navigate, handleReset }));
     },
   });
-
   return (
     <>
+      <ToastContainer autoClose={3000} />
       <div className="flex h-[100vh]">
         <section className="w-1/2 my-auto mx-auto hidden lg:block">
           <div className="mb-20 text-green-600">
@@ -78,15 +55,7 @@ const Login = () => {
                 name="email"
                 value={values.email}
                 onChange={handleChange}
-                onBlur={handleBlur}
               />
-              {errors.email ? (
-                <p className="text-red-600" g>
-                  {errors.email}
-                </p>
-              ) : (
-                ""
-              )}
             </div>
             <div className="mt-5 relative">
               <input
@@ -96,13 +65,7 @@ const Login = () => {
                 name="password"
                 value={values.password}
                 onChange={handleChange}
-                onBlur={handleBlur}
               />
-              {errors.password ? (
-                <p className="text-red-600">{errors.password}</p>
-              ) : (
-                ""
-              )}
               <p
                 className="absolute right-4 top-4 cursor-pointer"
                 onClick={handleShowPassword}

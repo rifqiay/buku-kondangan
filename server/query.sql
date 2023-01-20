@@ -1,4 +1,6 @@
--- Active: 1669293785404@@localhost@5432@buku-kondangan
+-- Active: 1673150891911@@127.0.0.1@5432@kondanganApp
+
+
 CREATE Table users(
     id VARCHAR PRIMARY KEY,
     nama VARCHAR(50),

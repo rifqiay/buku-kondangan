@@ -1,16 +1,21 @@
 import React from "react";
 import { Navbar } from "flowbite-react";
 import { CgProfile } from "react-icons/cg";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const NavbarComponent = () => {
+  const user = useSelector((state) => state.profile.user);
   return (
     <>
       <Navbar fluid={true} rounded={true}>
         <Navbar.Brand>
-          <span className="self-center whitespace-nowrap text-3xl font-semibold text-green-600">
+          <Link
+            to="/home"
+            className="self-center whitespace-nowrap text-3xl font-semibold text-green-600"
+          >
             Buku Kondangan
-          </span>
+          </Link>
         </Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse>
@@ -52,8 +57,15 @@ const NavbarComponent = () => {
           </Navbar>
           <Navbar>
             <NavLink to="/profile">
-              <div className="text-green-600 hover:text-green-400">
-                <CgProfile size="35px" />
+              <div className="text-green-600 hover:text-green-400 flex items-center gap-3">
+                <div>
+                  {user.photo ? (
+                    <img src={user.photo} alt="foto profile" />
+                  ) : (
+                    <CgProfile size="35px" />
+                  )}
+                </div>
+                <h1 className="sm:hidden">{user.nama}</h1>
               </div>
             </NavLink>
           </Navbar>

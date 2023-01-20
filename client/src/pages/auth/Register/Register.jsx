@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { BsEye } from "react-icons/bs";
-import { BsEyeSlash } from "react-icons/bs";
 import { Spinner } from "flowbite-react";
-import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import React, { useState } from "react";
+import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useDispatch } from "react-redux";
-import { RegisterAction } from "../../../config/redux/action/Auth";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { register } from "../../../config/featrues/AuthSlice";
 
 const Register = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -18,40 +18,23 @@ const Register = () => {
     showPassword ? setShowPassword(false) : setShowPassword(true);
   };
 
-  const {
-    values,
-    handleChange,
-    errors,
-    handleSubmit,
-    resetForm,
-    handleBlur,
-    touched,
-  } = useFormik({
-    // initial values
+  const { values, handleSubmit, handleChange, handleReset } = useFormik({
     initialValues: {
       nama: "",
       email: "",
       password: "",
     },
-    // validation
-    validationSchema: Yup.object({
-      nama: Yup.string().required("harus diisi"),
-      email: Yup.string().required("harus diisi").email("email tidak valid"),
-      password: Yup.string()
-        .required("harus diisi")
-        .min(5, "Minimal 5 karakter Maksimal 10 karakter")
-        .max(10, "Maksimal 10 karakter")
-        .matches(/[A-Z]/g, "Setidaknya mengandung 1 huruf Kapital"),
-    }),
-    // onSubmit
-    onSubmit: () => {
+    onSubmit: async () => {
       setLoading(true);
-      dispatch(RegisterAction(values, resetForm, setLoading, navigate));
+      await dispatch(
+        register({ values, toast, setLoading, navigate, handleReset })
+      );
     },
   });
 
   return (
     <>
+      <ToastContainer autoClose={3000} />
       <div className="flex h-[100vh]">
         <section className="w-1/2 my-auto mx-auto hidden lg:block">
           <div className="mb-20 text-green-600">
@@ -71,51 +54,30 @@ const Register = () => {
                 type="text"
                 placeholder="Nama Lengkap"
                 className="w-full p-3 border-2 shadow-md rounded-md border-green-600 focus:border-green-700"
-                value={values.nama}
                 name="nama"
+                value={values.nama}
                 onChange={handleChange}
               />
-              {errors.nama ? (
-                <p className="text-red-600" g>
-                  {errors.nama}
-                </p>
-              ) : (
-                ""
-              )}
             </div>
             <div className="mt-5">
               <input
                 type="email"
                 placeholder="Email"
                 className="w-full p-3 border-2 shadow-md rounded-md border-green-600 focus:border-green-700"
-                value={values.email}
                 name="email"
+                value={values.email}
                 onChange={handleChange}
               />
-              {errors.email ? (
-                <p className="text-red-600" g>
-                  {errors.email}
-                </p>
-              ) : (
-                ""
-              )}
             </div>
             <div className="mt-5 relative">
               <input
                 type={showPassword ? "password" : "text"}
                 placeholder="Kata sandi"
                 className="w-full p-3 border-2 shadow-md rounded-md border-green-600 focus:border-green-700"
-                value={values.password}
                 name="password"
+                value={values.password}
                 onChange={handleChange}
               />
-              {errors.password ? (
-                <p className="text-red-600" g>
-                  {errors.password}
-                </p>
-              ) : (
-                ""
-              )}
               <p
                 className="absolute right-4 top-4 cursor-pointer"
                 onClick={handleShowPassword}

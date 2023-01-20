@@ -1,19 +1,24 @@
-import React from "react";
+import jwt_decode from "jwt-decode";
+import React, { useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Card from "../../components/module/Card/Card";
 import NavbarComponent from "../../components/module/Navbar/Navbar";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { getUangAction } from "../../config/redux/action/Get";
-import jwt_decode from "jwt-decode";
-import { useState } from "react";
-import Hapus from "../../components/module/modals/Hapus";
+import {
+  DataUangSelector,
+  getDataUang,
+} from "../../config/featrues/DataUangSlice";
 
 const Home = () => {
-  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const { id } = jwt_decode(token);
-  const { getUang } = useSelector((state) => state.get);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const dispatch = useDispatch();
+
+  const dataUang = useSelector(DataUangSelector.selectAll);
+
   const [key, setKey] = useState("");
 
   const handleSearch = (e) => {
@@ -21,19 +26,26 @@ const Home = () => {
     getData();
   };
 
-  const getData = () => {
-    dispatch(getUangAction(id, key));
+  const getData = async () => {
+    dispatch(getDataUang({ id, key }));
   };
 
   useEffect(() => {
-    if (key === "") {
+    if (!key) {
       getData();
     }
   }, [key]);
 
+  useEffect(() => {
+    if (isDeleted) {
+      getData();
+    }
+  }, [isDeleted]);
+
   return (
     <>
       <NavbarComponent />
+      <ToastContainer />
       <div className="w-11/12 mx-auto">
         <div className="flex justify-end">
           <div className="mx-3 mt-5 relative w-full sm:w-1/2">
@@ -58,8 +70,8 @@ const Home = () => {
             Uang
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {getUang.length > 0 ? (
-              getUang.map((item, key) => (
+            {dataUang.length > 0 ? (
+              dataUang.map((item, key) => (
                 <div key={key}>
                   <Card
                     id={key}
@@ -68,6 +80,8 @@ const Home = () => {
                     alamat={item.alamat}
                     jumlah={item.jumlah}
                     idTamu={item.id}
+                    setIsDeleted={setIsDeleted}
+                    toast={toast}
                   />
                 </div>
               ))

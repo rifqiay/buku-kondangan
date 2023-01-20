@@ -1,32 +1,36 @@
 import React from "react";
-import * as Yup from "yup";
 import jwt_decode from "jwt-decode";
 import { useFormik } from "formik";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { api } from "../../../config/api";
 import { useDispatch } from "react-redux";
-import { CreateDataBarang } from "../../../config/redux/action/Create";
+import { createDataBarang } from "../../../config/featrues/DataBarangSlice";
 
 const TambahDataBarang = () => {
-  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const { id } = jwt_decode(token);
-  const { handleChange, handleReset, handleSubmit, values, errors, resetForm } =
-    useFormik({
-      initialValues: {
-        nama: "",
-        alamat: "",
-        barang: "",
-        user_id: id,
-      },
-      validationSchema: Yup.object({
-        nama: Yup.string().required("Harus diisi"),
-        alamat: Yup.string().required("Harus diisi"),
-        barang: Yup.string().required("Harus diisi"),
-      }),
-      onSubmit: () => {
-        dispatch(CreateDataBarang(values));
-        resetForm();
-      },
-    });
+  const dispatch = useDispatch();
+
+  // form
+  const { values, handleChange, handleSubmit, handleReset } = useFormik({
+    initialValues: {
+      nama: "",
+      alamat: "",
+      barang: "",
+      user_id: id,
+    },
+    onSubmit: async () => {
+      dispatch(createDataBarang({ values, toast, handleReset }));
+      // try {
+      //   const response = await api.post("barang/create", values);
+      //   handleReset();
+      //   toast.success(response.data.message);
+      // } catch (error) {
+      //   console.log(error);
+      // }
+    },
+  });
 
   return (
     <>
@@ -37,8 +41,8 @@ const TambahDataBarang = () => {
             type="text"
             placeholder="Nama"
             className="w-full rounded-md border-green-600 border-2 focus:border-2 focus:border-green-600 p-3"
-            name="nama"
             value={values.nama}
+            name="nama"
             onChange={handleChange}
           />
         </div>

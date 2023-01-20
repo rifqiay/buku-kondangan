@@ -4,35 +4,48 @@ import NavbarComponent from "../../components/module/Navbar/Navbar";
 import { BsSearch } from "react-icons/bs";
 import Card from "../../components/module/Card/Card";
 import { useDispatch, useSelector } from "react-redux";
-import { getBarangAction } from "../../config/redux/action/Get";
+import { api } from "../../config/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  DataBarangSelector,
+  getDataBarang,
+} from "../../config/featrues/DataBarangSlice";
 
 const Barang = () => {
-  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const { id } = jwt_decode(token);
-  const { getBarang } = useSelector((state) => state.get);
   const [key, setKey] = useState("");
+  const [isDeleted, setIsDeleted] = useState(false);
+  const dispatch = useDispatch();
+
+  const barang = useSelector(DataBarangSelector.selectAll);
 
   const handleSearch = (e) => {
     e.preventDefault();
     getData();
   };
 
-  const getData = () => {
-    dispatch(getBarangAction(id, key));
+  const getData = async () => {
+    dispatch(getDataBarang({ id, key }));
   };
 
   useEffect(() => {
-    if (key === "") {
+    if (!key) {
       getData();
     }
   }, [key]);
 
-  // console.log(state);
+  useEffect(() => {
+    if (isDeleted) {
+      getData();
+    }
+  }, [isDeleted]);
 
   return (
     <>
       <NavbarComponent />
+      <ToastContainer />
       <div className="w-11/12 mx-auto">
         <div className="flex justify-end">
           <div className="mx-3 mt-5 w-full sm:w-1/2 relative">
@@ -57,7 +70,27 @@ const Barang = () => {
             Barang
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {getBarang.map((item, key) => (
+            {barang.length > 0 ? (
+              barang.map((item, key) => (
+                <div key={key}>
+                  <Card
+                    id={key}
+                    className="flex justify-between mt-3"
+                    nama={item.nama}
+                    alamat={item.alamat}
+                    barang={item.barang}
+                    idTamu={item.id}
+                    setIsDeleted={setIsDeleted}
+                    toast={toast}
+                  />
+                </div>
+              ))
+            ) : (
+              <div>
+                <p>Data tidak ada</p>
+              </div>
+            )}
+            {/* {getBarang.map((item, key) => (
               <div key={key}>
                 <Card
                   id={key}
@@ -67,7 +100,7 @@ const Barang = () => {
                   idTamu={item.id}
                 />
               </div>
-            ))}
+            ))} */}
           </div>
         </div>
       </div>

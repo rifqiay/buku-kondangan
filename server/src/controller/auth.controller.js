@@ -57,6 +57,7 @@ const authController = {
       };
       const result = {
         token: generateToken(payload),
+        refreshToken: generateRefershToken(payload),
       };
       response(res, result, 200);
     } catch (error) {

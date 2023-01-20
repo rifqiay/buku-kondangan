@@ -9,7 +9,7 @@ const router = express.Router();
 
 router
   .post("/create", createController)
-  .put("/edit/:id", updateController)
+  .put("/edit/:idsTamu", updateController)
   .delete("/delete/:id", removeController)
   .get("/:user_id", getDataController);
 
